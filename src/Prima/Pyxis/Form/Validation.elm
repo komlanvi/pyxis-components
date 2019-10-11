@@ -2,6 +2,7 @@ module Prima.Pyxis.Form.Validation exposing
     ( Validation(..)
     , ValidationType(..), SeverityLevel(..)
     , pickError
+    , ShowValidationPolicy(..), customShowPolicy, defaultShowPolicy
     )
 
 {-| Allows to create Validation model for the form.
@@ -89,3 +90,18 @@ pickError rule =
 
         Custom (SeverityLevel Warning) customRule warning ->
             warning
+
+
+type ShowValidationPolicy model
+    = Default
+    | CustomPolicy (model -> Bool)
+
+
+defaultShowPolicy : ShowValidationPolicy model
+defaultShowPolicy =
+    Default
+
+
+customShowPolicy : (model -> Bool) -> ShowValidationPolicy model
+customShowPolicy =
+    CustomPolicy

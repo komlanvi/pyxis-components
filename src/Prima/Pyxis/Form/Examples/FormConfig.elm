@@ -6,6 +6,7 @@ module Prima.Pyxis.Form.Examples.FormConfig exposing
     , note
     , password
     , staticHtml
+    , test
     , username
     , visitedCountries
     )
@@ -21,7 +22,30 @@ import Prima.Pyxis.Form.Examples.Model
         , Model
         , Msg(..)
         )
-import Prima.Pyxis.Form.Validation exposing (SeverityLevel(..), Validation(..), ValidationType(..))
+import Prima.Pyxis.Form.Validation
+    exposing
+        ( SeverityLevel(..)
+        , ShowValidationPolicy(..)
+        , Validation(..)
+        , ValidationType(..)
+        )
+
+
+test : FormField FormData Msg
+test =
+    Form.textConfig
+        "test"
+        (Just "Test")
+        [ minlength 3, maxlength 12 ]
+        .test
+        [ Event.onInput (UpdateField Test)
+        , Event.onFocus (OnFocus Test)
+        , Event.onBlur (OnBlur Test)
+        ]
+        (CustomPolicy (always True))
+        [ -- Custom (SeverityLevel Error) ((<=) 3 << String.length << Maybe.withDefault "" << .test) "Value must be between 3 and 12 characters length."
+          Custom (SeverityLevel Warning) ((<=) 3 << String.length << Maybe.withDefault "" << .test) "Value must be between 3 and 12 characters length."
+        ]
 
 
 username : FormField FormData Msg
@@ -35,6 +59,7 @@ username =
         , Event.onFocus (OnFocus Username)
         , Event.onBlur (OnBlur Username)
         ]
+        Default
         [ NotEmpty (SeverityLevel Error) "Empty value is not acceptable."
         ]
 
@@ -47,6 +72,7 @@ password isSubmitted =
         []
         .password
         [ Event.onInput (UpdateField Password) ]
+        Default
         [ NotEmpty (SeverityLevel Error) "Empty value is not acceptable."
         , Custom (SeverityLevel Warning)
             (\m ->
@@ -64,6 +90,7 @@ note =
         []
         .note
         [ Event.onInput (UpdateField Note) ]
+        Default
         [ Custom (SeverityLevel Warning) ((<=) 3 << String.length << Maybe.withDefault "" << .note) "Value should be between 3 and 12 characters length." ]
 
 
@@ -82,6 +109,7 @@ gender =
         [ Form.radioOption "Male" "male"
         , Form.radioOption "Female" "female"
         ]
+        Default
         [ Custom (SeverityLevel Error) ((==) "female" << Maybe.withDefault "female" << .gender) "You must select `Female` to proceed." ]
 
 
@@ -94,6 +122,7 @@ visitedCountries data =
         (List.map (\( label, slug, checked ) -> ( slug, checked )) << .visitedCountries)
         [ Event.onCheck (UpdateCheckbox VisitedCountries) ]
         (List.map (\( label, slug, checked ) -> Form.checkboxOption label slug checked) data.visitedCountries)
+        Default
         []
 
 
@@ -120,6 +149,7 @@ city isOpen =
             , Form.selectOption "Genoa" "GE"
             ]
         )
+        Default
         [ NotEmpty (SeverityLevel Error) "Empty value is not acceptable." ]
 
 
@@ -134,6 +164,7 @@ dateOfBirth { isVisibleDP, dateOfBirthDP } =
         [ Event.onInput (UpdateField DateOfBirth) ]
         dateOfBirthDP
         isVisibleDP
+        Default
         [ Custom (SeverityLevel Error) (Maybe.withDefault False << Maybe.map (always True) << .dateOfBirth) "This is not a valid date." ]
 
 
@@ -191,6 +222,7 @@ country { countryFilter, isOpenCountry } =
          ]
             |> List.filter (String.contains lowerFilter << String.toLower << .label)
         )
+        Default
         [ NotEmpty (SeverityLevel Error) "Empty value is not acceptable." ]
 
 

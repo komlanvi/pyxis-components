@@ -1,7 +1,7 @@
 module Prima.Pyxis.Form.Examples.View exposing (view)
 
 import Browser
-import Html exposing (Html, button, i, text)
+import Html exposing (Html, button, div, i, span, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Prima.Pyxis.Form as Form
@@ -20,8 +20,12 @@ view model =
 appBody : Model -> List (Html Msg)
 appBody ({ data, formConfig } as model) =
     let
+        _ =
+            Debug.log "Form State: " (Form.state formConfig)
+
         renderModel =
-            [ ( Form.renderField formConfig data, [ Config.username, Config.password (Form.isFormSubmitted <| Form.state formConfig) ] )
+            [ ( Form.renderField formConfig data, [ Config.test ] )
+            , ( Form.renderField formConfig data, [ Config.username, Config.password (Form.isFormSubmitted <| Form.state formConfig) ] )
             , ( Form.renderField formConfig data, [ Config.note ] )
             , ( Form.renderField formConfig data, [ Config.gender ] )
             , ( Form.renderField formConfig data, [ Config.visitedCountries data ] )
@@ -33,21 +37,21 @@ appBody ({ data, formConfig } as model) =
         form =
             Form.addFields renderModel formConfig
     in
-    [ Helpers.pyxisStyle, Form.render form, btnSubmit, btnReset ]
+    [ div [ class "a-container directionColumn" ] [ Helpers.pyxisStyle, Form.render form, btnSubmit, btnReset ] ]
 
 
 btnSubmit : Html Msg
 btnSubmit =
     button
-        [ onClick Submit ]
-        [ text "Submit" ]
+        [ class "a-btn a-btn--primary", onClick Submit ]
+        [ span [] [ text "Submit" ] ]
 
 
 btnReset : Html Msg
 btnReset =
     button
-        [ onClick Reset ]
-        [ text "Reset" ]
+        [ class "a-btn a-btn--attention", onClick Reset ]
+        [ span [] [ text "Reset" ] ]
 
 
 datePickerIcon : Html Msg

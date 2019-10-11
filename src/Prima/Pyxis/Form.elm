@@ -105,7 +105,13 @@ import Html.Attributes
         )
 import Prima.Pyxis.DatePicker as DatePicker
 import Prima.Pyxis.Form.Event as Events exposing (Event)
-import Prima.Pyxis.Form.Validation as Validation exposing (SeverityLevel(..), Validation(..), ValidationType(..))
+import Prima.Pyxis.Form.Validation as Validation
+    exposing
+        ( SeverityLevel(..)
+        , ShowValidationPolicy(..)
+        , Validation(..)
+        , ValidationType(..)
+        )
 import Prima.Pyxis.Helpers as Helpers
 import Regex
 
@@ -306,6 +312,7 @@ type alias TextConfig model msg =
     , attrs : List (Attribute msg)
     , reader : model -> Maybe Value
     , events : List (Event msg)
+    , showValidationPolicy : ShowValidationPolicy model
     }
 
 
@@ -315,6 +322,7 @@ type alias PasswordConfig model msg =
     , attrs : List (Attribute msg)
     , reader : model -> Maybe Value
     , events : List (Event msg)
+    , showValidationPolicy : ShowValidationPolicy model
     }
 
 
@@ -324,6 +332,7 @@ type alias TextareaConfig model msg =
     , attrs : List (Attribute msg)
     , reader : model -> Maybe Value
     , events : List (Event msg)
+    , showValidationPolicy : ShowValidationPolicy model
     }
 
 
@@ -334,6 +343,7 @@ type alias RadioConfig model msg =
     , reader : model -> Maybe Value
     , events : List (Event msg)
     , options : List RadioOption
+    , showValidationPolicy : ShowValidationPolicy model
     }
 
 
@@ -357,6 +367,7 @@ type alias CheckboxConfig model msg =
     , reader : model -> List ( Slug, Bool )
     , events : List (Event msg)
     , options : List CheckboxOption
+    , showValidationPolicy : ShowValidationPolicy model
     }
 
 
@@ -384,6 +395,7 @@ type alias SelectConfig model msg =
     , reader : model -> Maybe Value
     , events : List (Event msg)
     , options : List SelectOption
+    , showValidationPolicy : ShowValidationPolicy model
     }
 
 
@@ -409,6 +421,7 @@ type alias DatepickerConfig model msg =
     , events : List (Event msg)
     , instance : DatePicker.Model
     , showDatePicker : Bool
+    , showValidationPolicy : ShowValidationPolicy model
     }
 
 
@@ -422,6 +435,7 @@ type alias AutocompleteConfig model msg =
     , choiceReader : model -> Maybe Value
     , events : List (Event msg)
     , options : List AutocompleteOption
+    , showValidationPolicy : ShowValidationPolicy model
     }
 
 
@@ -496,8 +510,8 @@ This field can handle only onInput, onFocus, onBlur events. Other events will be
             ]
 
 -}
-textConfig : Slug -> Maybe Label -> List (Attribute msg) -> (model -> Maybe Value) -> List (Event msg) -> List (Validation model) -> FormField model msg
-textConfig slug label attrs reader events validations =
+textConfig : Slug -> Maybe Label -> List (Attribute msg) -> (model -> Maybe Value) -> List (Event msg) -> ShowValidationPolicy model -> List (Validation model) -> FormField model msg
+textConfig slug label attrs reader events showValidationPolicy validations =
     FormField <|
         FormFieldTextConfig
             (TextConfig
@@ -506,14 +520,15 @@ textConfig slug label attrs reader events validations =
                 attrs
                 reader
                 events
+                showValidationPolicy
             )
             validations
 
 
 {-| Creates a password text field. Same configuration as `textConfig`.
 -}
-passwordConfig : Slug -> Maybe Label -> List (Attribute msg) -> (model -> Maybe Value) -> List (Event msg) -> List (Validation model) -> FormField model msg
-passwordConfig slug label attrs reader events validations =
+passwordConfig : Slug -> Maybe Label -> List (Attribute msg) -> (model -> Maybe Value) -> List (Event msg) -> ShowValidationPolicy model -> List (Validation model) -> FormField model msg
+passwordConfig slug label attrs reader events showValidationPolicy validations =
     FormField <|
         FormFieldPasswordConfig
             (PasswordConfig
@@ -522,14 +537,15 @@ passwordConfig slug label attrs reader events validations =
                 attrs
                 reader
                 events
+                showValidationPolicy
             )
             validations
 
 
 {-| Creates a texarea field. Same configuration as `textConfig`.
 -}
-textareaConfig : Slug -> Maybe Label -> List (Attribute msg) -> (model -> Maybe Value) -> List (Event msg) -> List (Validation model) -> FormField model msg
-textareaConfig slug label attrs reader events validations =
+textareaConfig : Slug -> Maybe Label -> List (Attribute msg) -> (model -> Maybe Value) -> List (Event msg) -> ShowValidationPolicy model -> List (Validation model) -> FormField model msg
+textareaConfig slug label attrs reader events showValidationPolicy validations =
     FormField <|
         FormFieldTextareaConfig
             (TextareaConfig
@@ -538,6 +554,7 @@ textareaConfig slug label attrs reader events validations =
                 attrs
                 reader
                 events
+                showValidationPolicy
             )
             validations
 
@@ -576,8 +593,8 @@ This field can handle only onSelect event. Other events will be ignored.
             []
 
 -}
-radioConfig : Slug -> Maybe Label -> List (Attribute msg) -> (model -> Maybe Value) -> List (Event msg) -> List RadioOption -> List (Validation model) -> FormField model msg
-radioConfig slug label attrs reader events options validations =
+radioConfig : Slug -> Maybe Label -> List (Attribute msg) -> (model -> Maybe Value) -> List (Event msg) -> List RadioOption -> ShowValidationPolicy model -> List (Validation model) -> FormField model msg
+radioConfig slug label attrs reader events options showValidationPolicy validations =
     FormField <|
         FormFieldRadioConfig
             (RadioConfig
@@ -587,6 +604,7 @@ radioConfig slug label attrs reader events options validations =
                 reader
                 events
                 options
+                showValidationPolicy
             )
             validations
 
@@ -632,8 +650,8 @@ This field can handle only onCheck event. Other events will be ignored.
             []
 
 -}
-checkboxConfig : Slug -> Maybe Label -> List (Attribute msg) -> (model -> List ( Slug, Bool )) -> List (Event msg) -> List CheckboxOption -> List (Validation model) -> FormField model msg
-checkboxConfig slug label attrs reader events options validations =
+checkboxConfig : Slug -> Maybe Label -> List (Attribute msg) -> (model -> List ( Slug, Bool )) -> List (Event msg) -> List CheckboxOption -> ShowValidationPolicy model -> List (Validation model) -> FormField model msg
+checkboxConfig slug label attrs reader events options showValidationPolicy validations =
     FormField <|
         FormFieldCheckboxConfig
             (CheckboxConfig
@@ -643,6 +661,7 @@ checkboxConfig slug label attrs reader events options validations =
                 reader
                 events
                 options
+                showValidationPolicy
             )
             validations
 
@@ -694,8 +713,8 @@ This field can handle only onToggle, onInput, onSelect, onFocus and onBlur event
             [ NotEmpty (SeverityLevel Error) "Empty value is not acceptable." ]
 
 -}
-selectConfig : Slug -> Maybe Label -> Bool -> Bool -> Maybe String -> List (Attribute msg) -> (model -> Maybe Value) -> List (Event msg) -> List SelectOption -> List (Validation model) -> FormField model msg
-selectConfig slug label isDisabled isOpen placeholder attrs reader events options validations =
+selectConfig : Slug -> Maybe Label -> Bool -> Bool -> Maybe String -> List (Attribute msg) -> (model -> Maybe Value) -> List (Event msg) -> List SelectOption -> ShowValidationPolicy model -> List (Validation model) -> FormField model msg
+selectConfig slug label isDisabled isOpen placeholder attrs reader events options showValidationPolicy validations =
     FormField <|
         FormFieldSelectConfig
             (SelectConfig
@@ -708,6 +727,7 @@ selectConfig slug label isDisabled isOpen placeholder attrs reader events option
                 reader
                 events
                 options
+                showValidationPolicy
             )
             validations
 
@@ -747,8 +767,8 @@ This field can handle only onInput event. Other events will be ignored.
             []
 
 -}
-datepickerConfig : Slug -> Maybe Label -> List (Attribute msg) -> (model -> Maybe Value) -> (DatePicker.Msg -> msg) -> List (Event msg) -> DatePicker.Model -> Bool -> List (Validation model) -> FormField model msg
-datepickerConfig slug label attrs reader datePickerTagger events datepicker showDatePicker validations =
+datepickerConfig : Slug -> Maybe Label -> List (Attribute msg) -> (model -> Maybe Value) -> (DatePicker.Msg -> msg) -> List (Event msg) -> DatePicker.Model -> Bool -> ShowValidationPolicy model -> List (Validation model) -> FormField model msg
+datepickerConfig slug label attrs reader datePickerTagger events datepicker showDatePicker showValidationPolicy validations =
     FormField <|
         FormFieldDatepickerConfig
             (DatepickerConfig
@@ -760,6 +780,7 @@ datepickerConfig slug label attrs reader datePickerTagger events datepicker show
                 events
                 datepicker
                 showDatePicker
+                showValidationPolicy
             )
             validations
 
@@ -815,8 +836,8 @@ This field can handle only onSelect, onAutocompleteFilter, onFocus and onBlur ev
             []
 
 -}
-autocompleteConfig : String -> Maybe String -> Bool -> Maybe String -> List (Attribute msg) -> (model -> Maybe Value) -> (model -> Maybe Value) -> List (Event msg) -> List AutocompleteOption -> List (Validation model) -> FormField model msg
-autocompleteConfig slug label isOpen noResults attrs filterReader choiceReader events options validations =
+autocompleteConfig : String -> Maybe String -> Bool -> Maybe String -> List (Attribute msg) -> (model -> Maybe Value) -> (model -> Maybe Value) -> List (Event msg) -> List AutocompleteOption -> ShowValidationPolicy model -> List (Validation model) -> FormField model msg
+autocompleteConfig slug label isOpen noResults attrs filterReader choiceReader events options showValidationPolicy validations =
     FormField <|
         FormFieldAutocompleteConfig
             (AutocompleteConfig
@@ -829,6 +850,7 @@ autocompleteConfig slug label isOpen noResults attrs filterReader choiceReader e
                 choiceReader
                 events
                 options
+                showValidationPolicy
             )
             validations
 
@@ -891,7 +913,7 @@ renderField (Form formConfig) model (FormField opaqueConfig) =
 
         errors =
             (List.singleton
-                << Helpers.renderIf (isFormSubmitted formConfig.state && shouldShowError model (FormField opaqueConfig))
+                << Helpers.renderIf (model |> pickShowValidationPolicy (FormField opaqueConfig) formConfig.state)
                 << renderError
                 << String.join " "
                 << pickError model
@@ -937,6 +959,47 @@ renderField (Form formConfig) model (FormField opaqueConfig) =
     )
         ++ errors
         ++ warnings
+
+
+pickShowValidationPolicy : FormField model msg -> FormState -> (model -> Bool)
+pickShowValidationPolicy (FormField opaqueConfig) formState =
+    let
+        pickLogic : ShowValidationPolicy model -> (model -> Bool)
+        pickLogic showValidationPolicy =
+            case showValidationPolicy of
+                Default ->
+                    (&&) (isFormSubmitted formState) << shouldShowError (FormField opaqueConfig)
+
+                CustomPolicy showFunction ->
+                    showFunction
+    in
+    case opaqueConfig of
+        FormFieldAutocompleteConfig { showValidationPolicy } _ ->
+            pickLogic showValidationPolicy
+
+        FormFieldCheckboxConfig { showValidationPolicy } _ ->
+            pickLogic showValidationPolicy
+
+        FormFieldDatepickerConfig { showValidationPolicy } _ ->
+            pickLogic showValidationPolicy
+
+        FormFieldPasswordConfig { showValidationPolicy } _ ->
+            pickLogic showValidationPolicy
+
+        FormFieldRadioConfig { showValidationPolicy } _ ->
+            pickLogic showValidationPolicy
+
+        FormFieldSelectConfig { showValidationPolicy } _ ->
+            pickLogic showValidationPolicy
+
+        FormFieldTextareaConfig { showValidationPolicy } _ ->
+            pickLogic showValidationPolicy
+
+        FormFieldTextConfig { showValidationPolicy } _ ->
+            pickLogic showValidationPolicy
+
+        FormFieldPureHtmlConfig _ ->
+            always True
 
 
 {-| Renders a field by receiving the `Form`, the `FormFieldGroup`, and the `FormField` configuration.
@@ -987,7 +1050,7 @@ renderFieldWithGroup (Form formConfig) model group (FormField opaqueConfig) =
 
         errors =
             (List.singleton
-                << Helpers.renderIf (isFormSubmitted formConfig.state && shouldShowError model (FormField opaqueConfig))
+                << Helpers.renderIf (model |> pickShowValidationPolicy (FormField opaqueConfig) formConfig.state)
                 << renderError
                 << String.join " "
                 << pickError model
@@ -1113,7 +1176,7 @@ renderWarning warning =
 
 
 renderInput : FormState -> model -> TextConfig model msg -> List (Validation model) -> List (Html msg)
-renderInput formState model ({ reader, slug, label, attrs } as config) validations =
+renderInput formState model ({ reader, slug, label, attrs, showValidationPolicy } as config) validations =
     let
         opaqueConfig =
             FormField (FormFieldTextConfig config validations)
@@ -1126,20 +1189,33 @@ renderInput formState model ({ reader, slug, label, attrs } as config) validatio
 
         warning =
             hasWarning model opaqueConfig
+
+        inputClassList =
+            case showValidationPolicy of
+                Default ->
+                    [ ( "a-form__field__input", True )
+                    , ( "is-valid", valid )
+                    , ( "has-errors", isFormSubmitted formState && not valid )
+                    , ( "is-pristine", pristine )
+                    , ( "is-touched", not pristine )
+                    , ( "has-warnings", warning )
+                    ]
+
+                CustomPolicy showValidation ->
+                    [ ( "a-form__field__input", True )
+                    , ( "is-valid", isValid model opaqueConfig && showValidation model )
+                    , ( "has-warnings", warning && showValidation model )
+                    , ( "has-errors", hasError model opaqueConfig && showValidation model )
+                    , ( "is-pristine", pristine )
+                    , ( "is-touched", showValidation model )
+                    ]
     in
     [ Html.input
         ([ type_ "text"
          , (value << Maybe.withDefault "" << reader) model
          , id slug
          , name slug
-         , classList
-            [ ( "a-form__field__input", True )
-            , ( "is-valid", valid )
-            , ( "is-invalid", isFormSubmitted formState && not valid )
-            , ( "is-pristine", pristine )
-            , ( "is-touched", not pristine )
-            , ( "has-warn", warning )
-            ]
+         , classList inputClassList
          ]
             ++ attrs
             ++ Events.onInputAttribute config.events
@@ -1173,7 +1249,7 @@ renderPassword formState model ({ reader, slug, label, attrs } as config) valida
          , classList
             [ ( "a-form__field__input", True )
             , ( "is-valid", valid )
-            , ( "is-invalid", isFormSubmitted formState && not valid )
+            , ( "has-errors", isFormSubmitted formState && not valid )
             , ( "is-pristine", pristine )
             , ( "is-touched", not pristine )
             , ( "has-warn", warning )
@@ -1210,7 +1286,7 @@ renderTextarea formState model ({ reader, slug, label, attrs, events } as config
          , classList
             [ ( "a-form__field__textarea", True )
             , ( "is-valid", valid )
-            , ( "is-invalid", isFormSubmitted formState && not valid )
+            , ( "has-errors", isFormSubmitted formState && not valid )
             , ( "is-pristine", pristine )
             , ( "is-touched", not pristine )
             , ( "has-warn", warning )
@@ -1336,7 +1412,7 @@ renderSelect formState model ({ slug, label, reader, attrs, events } as config) 
          , classList
             [ ( "a-form__field__select", True )
             , ( "is-valid", valid )
-            , ( "is-invalid", isFormSubmitted formState && not valid )
+            , ( "has-errors", isFormSubmitted formState && not valid )
             , ( "is-pristine", pristine )
             , ( "is-touched", not pristine )
             , ( "has-warn", warning )
@@ -1396,7 +1472,7 @@ renderCustomSelect formState model ({ slug, label, reader, isDisabled, isOpen, a
             [ ( "a-form__field__customSelect", True )
             , ( "is-open", isOpen )
             , ( "is-valid", valid )
-            , ( "is-invalid", isFormSubmitted formState && not valid )
+            , ( "has-errors", isFormSubmitted formState && not valid )
             , ( "is-pristine", pristine )
             , ( "is-touched", not pristine )
             , ( "is-disabled", isDisabled )
@@ -1476,7 +1552,7 @@ renderDatepicker formState model ({ attrs, reader, datePickerTagger, slug, label
          , classList
             [ ( "a-form__field__input a-form__field__datepicker", True )
             , ( "is-valid", valid )
-            , ( "is-invalid", isFormSubmitted formState && not valid )
+            , ( "has-errors", isFormSubmitted formState && not valid )
             , ( "is-pristine", pristine )
             , ( "is-touched", not pristine )
             , ( "has-warn", warning )
@@ -1494,7 +1570,7 @@ renderDatepicker formState model ({ attrs, reader, datePickerTagger, slug, label
          , classList
             [ ( "a-form__field__date", True )
             , ( "is-valid", valid )
-            , ( "is-invalid", not valid )
+            , ( "has-errors", not valid )
             , ( "is-pristine", pristine )
             , ( "is-touched", not pristine )
             , ( "has-warn", warning )
@@ -1551,7 +1627,7 @@ renderAutocomplete formState model ({ filterReader, choiceReader, slug, label, i
              , classList
                 [ ( "a-form__field__input", True )
                 , ( "is-valid", valid )
-                , ( "is-invalid", isFormSubmitted formState && not valid )
+                , ( "has-errors", isFormSubmitted formState && not valid )
                 , ( "is-pristine", pristine )
                 , ( "is-touched", not pristine )
                 , ( "has-warn", warning )
@@ -1613,6 +1689,11 @@ isValid model (FormField opaqueConfig) =
 hasWarning : model -> FormField model msg -> Bool
 hasWarning model (FormField opaqueConfig) =
     not <| List.all (validateWarning model opaqueConfig) (pickValidationRules opaqueConfig)
+
+
+hasError : model -> FormField model msg -> Bool
+hasError model (FormField opaqueConfig) =
+    not <| List.all (validateError model opaqueConfig) (pickValidationRules opaqueConfig)
 
 
 {-| Check if a `FormField` is pristine
@@ -1902,6 +1983,132 @@ validateWarning model config validation =
             True
 
 
+validateError : model -> FormFieldConfig model msg -> Validation model -> Bool
+validateError model config validation =
+    let
+        isEmpty : Maybe String -> Bool
+        isEmpty =
+            String.isEmpty << Maybe.withDefault ""
+    in
+    case ( validation, config ) of
+        ( NotEmpty (SeverityLevel Error) _, FormFieldTextConfig { reader } _ ) ->
+            (not << isEmpty << reader) model
+
+        ( NotEmpty (SeverityLevel Error) _, FormFieldTextareaConfig { reader } _ ) ->
+            (not << isEmpty << reader) model
+
+        ( NotEmpty (SeverityLevel Error) _, FormFieldPasswordConfig { reader } _ ) ->
+            (not << isEmpty << reader) model
+
+        ( NotEmpty (SeverityLevel Error) _, FormFieldRadioConfig { reader } _ ) ->
+            (not << isEmpty << reader) model
+
+        ( NotEmpty (SeverityLevel Error) _, FormFieldSelectConfig { reader } _ ) ->
+            (not << isEmpty << reader) model
+
+        ( NotEmpty (SeverityLevel Error) _, FormFieldAutocompleteConfig { choiceReader } _ ) ->
+            (not << isEmpty << choiceReader) model
+
+        ( NotEmpty (SeverityLevel Error) _, FormFieldDatepickerConfig { reader } _ ) ->
+            (not << Helpers.isJust << reader) model
+
+        ( NotEmpty (SeverityLevel Error) _, FormFieldCheckboxConfig { reader } _ ) ->
+            (List.any Tuple.second << reader) model
+
+        ( Expression (SeverityLevel Error) exp _, FormFieldTextConfig { reader } _ ) ->
+            (Regex.contains exp << Maybe.withDefault "" << reader) model
+
+        ( Expression (SeverityLevel Error) exp _, FormFieldPasswordConfig { reader } _ ) ->
+            (Regex.contains exp << Maybe.withDefault "" << reader) model
+
+        ( Expression (SeverityLevel Error) exp _, FormFieldTextareaConfig { reader } _ ) ->
+            (Regex.contains exp << Maybe.withDefault "" << reader) model
+
+        ( Expression (SeverityLevel Error) exp _, FormFieldAutocompleteConfig { choiceReader } _ ) ->
+            (Regex.contains exp << Maybe.withDefault "" << choiceReader) model
+
+        ( Expression (SeverityLevel Error) exp _, _ ) ->
+            True
+
+        ( Custom (SeverityLevel Error) validator _, _ ) ->
+            validator model
+
+        ( _, FormFieldPureHtmlConfig _ ) ->
+            True
+
+        ( NotEmpty (SeverityLevel Warning) _, FormFieldAutocompleteConfig _ _ ) ->
+            True
+
+        ( NotEmpty (SeverityLevel Warning) _, FormFieldCheckboxConfig _ _ ) ->
+            True
+
+        ( NotEmpty (SeverityLevel Warning) _, FormFieldDatepickerConfig _ _ ) ->
+            True
+
+        ( NotEmpty (SeverityLevel Warning) _, FormFieldPasswordConfig _ _ ) ->
+            True
+
+        ( NotEmpty (SeverityLevel Warning) _, FormFieldRadioConfig _ _ ) ->
+            True
+
+        ( NotEmpty (SeverityLevel Warning) _, FormFieldSelectConfig _ _ ) ->
+            True
+
+        ( NotEmpty (SeverityLevel Warning) _, FormFieldTextareaConfig _ _ ) ->
+            True
+
+        ( NotEmpty (SeverityLevel Warning) _, FormFieldTextConfig _ _ ) ->
+            True
+
+        ( Expression (SeverityLevel Warning) _ _, FormFieldAutocompleteConfig _ _ ) ->
+            True
+
+        ( Expression (SeverityLevel Warning) _ _, FormFieldCheckboxConfig _ _ ) ->
+            True
+
+        ( Expression (SeverityLevel Warning) _ _, FormFieldDatepickerConfig _ _ ) ->
+            True
+
+        ( Expression (SeverityLevel Warning) _ _, FormFieldPasswordConfig _ _ ) ->
+            True
+
+        ( Expression (SeverityLevel Warning) _ _, FormFieldRadioConfig _ _ ) ->
+            True
+
+        ( Expression (SeverityLevel Warning) _ _, FormFieldSelectConfig _ _ ) ->
+            True
+
+        ( Expression (SeverityLevel Warning) _ _, FormFieldTextareaConfig _ _ ) ->
+            True
+
+        ( Expression (SeverityLevel Warning) _ _, FormFieldTextConfig _ _ ) ->
+            True
+
+        ( Custom (SeverityLevel Warning) _ _, FormFieldAutocompleteConfig _ _ ) ->
+            True
+
+        ( Custom (SeverityLevel Warning) _ _, FormFieldCheckboxConfig _ _ ) ->
+            True
+
+        ( Custom (SeverityLevel Warning) _ _, FormFieldDatepickerConfig _ _ ) ->
+            True
+
+        ( Custom (SeverityLevel Warning) _ _, FormFieldPasswordConfig _ _ ) ->
+            True
+
+        ( Custom (SeverityLevel Warning) _ _, FormFieldRadioConfig _ _ ) ->
+            True
+
+        ( Custom (SeverityLevel Warning) _ _, FormFieldSelectConfig _ _ ) ->
+            True
+
+        ( Custom (SeverityLevel Warning) _ _, FormFieldTextareaConfig _ _ ) ->
+            True
+
+        ( Custom (SeverityLevel Warning) _ _, FormFieldTextConfig _ _ ) ->
+            True
+
+
 pickValidationRules : FormFieldConfig model msg -> List (Validation model)
 pickValidationRules opaqueConfig =
     case opaqueConfig of
@@ -1961,8 +2168,8 @@ pickError model opaqueConfig =
         (pickValidationRules opaqueConfig)
 
 
-shouldShowError : model -> FormField model msg -> Bool
-shouldShowError model ((FormField opaqueConfig) as config) =
+shouldShowError : FormField model msg -> model -> Bool
+shouldShowError ((FormField opaqueConfig) as config) model =
     (not << isValid model) config && ((not << isPristine model) config || hasNotEmptyValidation opaqueConfig)
 
 

@@ -44,6 +44,7 @@ type alias FormData =
     , countryFilter : Maybe String
     , isOpenCountry : Bool
     , visitedCountries : List ( Label, Slug, Bool )
+    , test : Maybe String
     }
 
 
@@ -67,6 +68,7 @@ initialFormData =
         , ( "U.S.A", "USA", False )
         , ( "Great Britain", "GB", False )
         ]
+        Nothing
 
 
 type alias Flags =
@@ -105,6 +107,7 @@ type FieldName
     | Country
     | VisitedCountries
     | Note
+    | Test
 
 
 type Msg

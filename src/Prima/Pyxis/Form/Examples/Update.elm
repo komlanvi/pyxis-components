@@ -31,6 +31,11 @@ update msg model =
                 |> updateFormData (\f -> { f | username = value })
                 |> withoutCmds
 
+        UpdateField Test value ->
+            model
+                |> updateFormData (\f -> { f | test = value })
+                |> withoutCmds
+
         UpdateField Password value ->
             model
                 |> updateFormData (\f -> { f | password = value })
