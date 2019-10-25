@@ -1671,6 +1671,21 @@ hasNotEmptyValidation opaqueConfig =
             )
 
 
+hasCustomValidation : FormFieldConfig model msg -> Bool
+hasCustomValidation opaqueConfig =
+    opaqueConfig
+        |> pickValidationRules
+        |> List.any
+            (\validation ->
+                case validation of
+                    Custom _ _ ->
+                        True
+
+                    _ ->
+                        False
+            )
+
+
 pickError : model -> FormFieldConfig model msg -> List String
 pickError model opaqueConfig =
     List.filterMap
@@ -1687,4 +1702,8 @@ pickError model opaqueConfig =
 canShowError : model -> FormField model msg -> Bool
 canShowError model ((FormField opaqueConfig) as config) =
     (not << isValid model) config
-        && ((not << isPristine model) config || hasNotEmptyValidation opaqueConfig)
+        && ((not <| isPristine model config) || (hasNotEmptyValidation opaqueConfig || hasCustomValidation opaqueConfig))
+
+
+
+-- config || hasNotEmptyValidation opaqueConfig)
