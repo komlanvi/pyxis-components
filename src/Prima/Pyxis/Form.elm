@@ -1415,6 +1415,9 @@ renderDatepicker state model ({ attrs, reader, datePickerTagger, slug, label, in
             , ( "is-touched", not pristine )
             ]
          ]
+            ++ Events.onInputAttribute config.events
+            ++ Events.onFocusAttribute config.events
+            ++ Events.onBlurAttribute config.events
             ++ attrs
         )
         []
@@ -1432,6 +1435,9 @@ renderDatepicker state model ({ attrs, reader, datePickerTagger, slug, label, in
             , ( "is-touched", not pristine )
             ]
          ]
+            ++ Events.onInputAttribute config.events
+            ++ Events.onFocusAttribute config.events
+            ++ Events.onBlurAttribute config.events
             ++ attrs
         )
         []
