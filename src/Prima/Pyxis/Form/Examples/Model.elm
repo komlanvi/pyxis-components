@@ -62,7 +62,7 @@ initialFormData =
         Nothing
         Nothing
         False
-        [ ( "Italy", "ITA", False )
+        [ ( "Italy", "ITA", True )
         , ( "France", "FRA", False )
         , ( "U.S.A", "USA", False )
         , ( "Great Britain", "GB", False )

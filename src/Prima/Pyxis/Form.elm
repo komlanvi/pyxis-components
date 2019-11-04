@@ -1237,6 +1237,7 @@ renderCheckboxOption model ({ reader, attrs } as config) index option =
          , classList
             [ ( "a-form__field__checkbox", True )
             ]
+         , checked option.isChecked
          ]
             ++ attrs
             ++ Events.onCheckAttribute option.slug (not option.isChecked) config.events
