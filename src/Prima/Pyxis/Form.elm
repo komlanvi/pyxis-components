@@ -1493,6 +1493,7 @@ renderAutocomplete state model ({ filterReader, choiceReader, slug, label, isOpe
                 ]
              ]
                 ++ attrs
+                ++ Events.onFocusAttribute config.events
                 ++ Events.onAutocompleteFilterAttribute config.events
             )
             []
