@@ -15,20 +15,7 @@ import Prima.Pyxis.Form.Examples.Model as Model
 
 updateFormData : (FormData -> FormData) -> Model -> Model
 updateFormData mapper model =
-    { model
-        | data = mapper model.data
-    }
-
-
-setAsTouched : Model -> Model
-setAsTouched model =
-    if Form.isFormSubmitted model.formConfig then
-        model
-
-    else
-        { model
-            | formConfig = Form.setAsTouched model.formConfig
-        }
+    { model | data = mapper model.data }
 
 
 withoutCmds : Model -> ( Model, Cmd Msg )
@@ -38,41 +25,35 @@ withoutCmds model =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
+    case Debug.log "update" msg of
         UpdateField Username value ->
             model
                 |> updateFormData (\f -> { f | username = value })
-                |> setAsTouched
                 |> withoutCmds
 
         UpdateField Password value ->
             model
                 |> updateFormData (\f -> { f | password = value })
-                |> setAsTouched
                 |> withoutCmds
 
         UpdateField Note value ->
             model
                 |> updateFormData (\f -> { f | note = value })
-                |> setAsTouched
                 |> withoutCmds
 
         UpdateField Gender value ->
             model
                 |> updateFormData (\f -> { f | gender = value })
-                |> setAsTouched
                 |> withoutCmds
 
         UpdateField City value ->
             model
                 |> updateFormData (\f -> { f | city = value, isOpenCity = False })
-                |> setAsTouched
                 |> withoutCmds
 
         UpdateField Country value ->
             model
                 |> updateFormData (\f -> { f | country = value, countryFilter = Nothing, isOpenCountry = False })
-                |> setAsTouched
                 |> withoutCmds
 
         UpdateField DateOfBirth value ->
@@ -101,7 +82,6 @@ update msg model =
                             , isOpenCountry = False
                         }
                     )
-                |> setAsTouched
                 |> withoutCmds
 
         UpdateDatePicker DateOfBirth dpMsg ->
@@ -111,13 +91,11 @@ update msg model =
             in
             model
                 |> updateFormData (\f -> { f | dateOfBirthDP = updatedInstance f, dateOfBirth = (Just << Date.format "dd/MM/y" << DatePicker.selectedDate) (updatedInstance f) })
-                |> setAsTouched
                 |> withoutCmds
 
         UpdateAutocomplete Country value ->
             model
                 |> updateFormData (\f -> { f | countryFilter = value, isOpenCountry = True })
-                |> setAsTouched
                 |> withoutCmds
 
         UpdateCheckbox VisitedCountries ( slug, isChecked ) ->
@@ -137,13 +115,11 @@ update msg model =
                                     f.visitedCountries
                         }
                     )
-                |> setAsTouched
                 |> withoutCmds
 
         Toggle City ->
             model
                 |> updateFormData (\f -> { f | isOpenCity = not f.isOpenCity })
-                |> setAsTouched
                 |> withoutCmds
 
         ToggleDatePicker ->
@@ -154,7 +130,6 @@ update msg model =
                             | isVisibleDP = not f.isVisibleDP
                         }
                     )
-                |> setAsTouched
                 |> withoutCmds
 
         OnFocus City ->
@@ -188,19 +163,7 @@ update msg model =
         Reset ->
             { model
                 | data = initialFormData
-                , formConfig = Form.init Form.WhenSubmitted
-            }
-                |> withoutCmds
-
-        ChangeValidationPolicy Form.Always ->
-            { model
-                | formConfig = Form.validateAlways model.formConfig
-            }
-                |> withoutCmds
-
-        ChangeValidationPolicy Form.WhenSubmitted ->
-            { model
-                | formConfig = Form.validateWhenSubmitted model.formConfig
+                , formConfig = Form.setAsPristine model.formConfig
             }
                 |> withoutCmds
 
